@@ -16,7 +16,7 @@ class UserService {
             throw new Error(`User with ${email} already exists`)
 
         const hashPassword = await hash(password, 5)
-        const activationLink = v4()
+        const activationLinkId = v4()
         const tokens = tokenService.generateTokens({
             email,
             access: false
@@ -29,15 +29,33 @@ class UserService {
                 password: hashPassword,
                 joinDate: new Date(),
                 loginDate: new Date(),
-                activationLink,
+                activationLink: activationLinkId,
                 refreshToken: tokens.refreshToken
             }
         })
-        await mailService.sendActivationMail(email, activationLink)
+        await mailService.sendActivationMail(email, process.env.API_URL + '/api/activate/' + activationLinkId)
 
-        return {...tokens, email }
+        return { ...tokens, email }
     }
 
+    async activate(activationLink: string) {
+        const user = await prismaClient.user.findFirst({
+            where: {
+                activationLink
+            }
+        })
+        if (!user) {
+            throw new Error('Incorrect activation link')
+        }
+        await prismaClient.user.updateMany({
+            where: {
+                activationLink
+            },
+            data: {
+                access: true
+            }
+        })
+    }
 }
 
 export default new UserService()
