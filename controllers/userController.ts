@@ -4,10 +4,11 @@ import { validationResult } from "express-validator";
 import { ApiError } from "../exceptions/apiError";
 
 class UserController {
+
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             const errors = validationResult(req);
-            if(!errors.isEmpty()){
+            if (!errors.isEmpty()) {
                 return next(ApiError.BadRequest("Validation Error", errors.array()))
             }
             const { email, password, fullName } = req.body
@@ -20,7 +21,7 @@ class UserController {
     }
     async login(req: Request, res: Response, next: NextFunction) {
         try {
-            const {email, password} = req.body
+            const { email, password } = req.body
             const userData = await userService.login(email, password)
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 60 * 24 * 3600 * 1000, httpOnly: true })
             return res.json(userData)
@@ -30,8 +31,8 @@ class UserController {
     }
     async logout(req: Request, res: Response, next: NextFunction) {
         try {
-            const {refreshToken} = req.cookies
-            await userService.logout(refreshToken) 
+            const { refreshToken } = req.cookies
+            await userService.logout(refreshToken)
             res.clearCookie('refreshToken')
             res.status(200).send()
         } catch (e) {
@@ -49,7 +50,31 @@ class UserController {
     }
     async refresh(req: Request, res: Response, next: NextFunction) {
         try {
-            const {refreshToken} = req.cookies
+            const { refreshToken } = req.cookies
+            const userData = await userService.refresh(refreshToken)
+            res.cookie('refreshToken', userData.refreshToken, { maxAge: 60 * 24 * 3600 * 1000, httpOnly: true })
+            return res.json(userData)
+        } catch (e) {
+            next(e)
+        }
+    }
+    async updateUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return next(ApiError.BadRequest("Validation Error", errors.array()))
+            }
+            const { id, email, oldPassword, password, fullName } = req.body
+            const userData = await userService.updateUser(id, email, password, fullName, oldPassword)
+            res.cookie('refreshToken', userData.refreshToken, { maxAge: 60 * 24 * 3600 * 1000, httpOnly: true })
+            return res.json(userData)
+        } catch (e) {
+            next(e)
+        }
+    }
+    async daleteUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { refreshToken } = req.cookies
             const userData = await userService.refresh(refreshToken)
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 60 * 24 * 3600 * 1000, httpOnly: true })
             return res.json(userData)
