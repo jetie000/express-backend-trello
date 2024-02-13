@@ -17,7 +17,7 @@ model User {
   password          String
   access            Boolean  @default(false)
   activationLink    String?
-  refreshToken      String
+  refreshToken      String?
   joinDate          DateTime
   loginDate         DateTime
   boardsPartipated  Board[]
