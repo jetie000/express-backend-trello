@@ -74,10 +74,9 @@ class UserController {
     }
     async daleteUser(req: Request, res: Response, next: NextFunction) {
         try {
-            const { refreshToken } = req.cookies
-            const userData = await userService.refresh(refreshToken)
-            res.cookie('refreshToken', userData.refreshToken, { maxAge: 60 * 24 * 3600 * 1000, httpOnly: true })
-            return res.json(userData)
+            const { userId, oldPassword } = req.body
+            const userData = await userService.deleteUser(userId, oldPassword)
+            return res.json("User has been deleted")
         } catch (e) {
             next(e)
         }

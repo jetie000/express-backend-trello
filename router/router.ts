@@ -1,6 +1,7 @@
 import { Router } from "express";
 import userController from "../controllers/userController";
 import { body } from "express-validator";
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 const router = Router()
 
@@ -17,7 +18,8 @@ router.put('/user',
     body('email').isEmail(),
     body('password').trim().isLength({ min: 8, max: 30 }),
     body('fullName').trim().notEmpty(),
+    authMiddleware,
     userController.updateUser)
-router.delete('/user/:id', userController.daleteUser)
+router.delete('/user', authMiddleware, userController.daleteUser)
 
 export default router;
