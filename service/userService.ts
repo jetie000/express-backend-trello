@@ -35,8 +35,8 @@ class UserService {
                 refreshToken: tokens.refreshToken
             }
         })
-        await mailService.sendActivationMail(email, process.env.API_URL + '/api/activate/' + activationLinkId)
-        
+        await mailService.sendActivationMail(email, process.env.API_URL + '/api/auth/activate/' + activationLinkId)
+
         return { ...tokens, email }
     }
 
