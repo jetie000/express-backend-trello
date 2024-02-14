@@ -24,7 +24,7 @@ class UserService {
             access: false
         })
 
-        prismaClient.user.create({
+        await prismaClient.user.create({
             data: {
                 email,
                 fullName,
@@ -36,7 +36,7 @@ class UserService {
             }
         })
         await mailService.sendActivationMail(email, process.env.API_URL + '/api/activate/' + activationLinkId)
-
+        
         return { ...tokens, email }
     }
 
@@ -70,6 +70,9 @@ class UserService {
         const isEqual = compare(password, userToFind.password)
         if (!isEqual)
             throw ApiError.BadRequest("Wrong password")
+        if (!userToFind.access){
+            throw ApiError.BadRequest("Confirm your account")
+        }
         const tokens = tokenService.generateTokens({
             email,
             access: userToFind.access
@@ -148,7 +151,7 @@ class UserService {
             access: false
         })
 
-        prismaClient.user.update({
+        await prismaClient.user.update({
             where: {
                 id: id
             },
