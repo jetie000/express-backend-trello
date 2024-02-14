@@ -72,11 +72,29 @@ class UserController {
             next(e)
         }
     }
-    async daleteUser(req: Request, res: Response, next: NextFunction) {
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
         try {
-            const { userId, oldPassword } = req.body
-            const userData = await userService.deleteUser(userId, oldPassword)
+            const userId = Number(req.params.id)
+            const userData = await userService.deleteUser(userId, (req as any).user.email)
             return res.json("User has been deleted")
+        } catch (e) {
+            next(e)
+        }
+    }
+    async getById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = Number(req.params.id)
+            const user = await userService.getById(userId, (req as any).user.email)
+            return res.json(user)
+        } catch (e) {
+            next(e)
+        }
+    }
+    async getByIds(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userIds = req.params.ids
+            const users = await userService.getByIds(userIds)
+            return res.json(users)
         } catch (e) {
             next(e)
         }

@@ -99,6 +99,15 @@ class UserService {
         return { ...tokens, email: userFromDB.email }
     }
 
+    async getById(userId: number, email: string) {
+        return await prismaClient.user.findFirst({
+            where:{
+                id: userId,
+                email
+            }
+        })
+    }
+
     async getByIds(ids: string) {
         const idsArr = ids.split('_').map(el => Number(el))
         const users = await prismaClient.user.findMany({
@@ -106,6 +115,13 @@ class UserService {
                 id: {
                     in: idsArr
                 }
+            },
+            select:{
+                email: true,
+                fullName: true,
+                loginDate: true,
+                boardsPartipated: true,
+                tasksParticipated: true
             }
         })
         return users
@@ -150,19 +166,18 @@ class UserService {
         return { ...tokens, email }
     }
 
-    async deleteUser(userId: number, oldPassword: string) {
-        const oldPass = await hash(oldPassword, 5)
+    async deleteUser(userId: number, email: string) {
         const userDB = await prismaClient.user.findUnique({
             where:{
                 id: userId,
-                password: oldPass
+                email
             }
         })
         if(!userDB){
-            throw ApiError.BadRequest("Wrong password")
+            throw ApiError.BadRequest("Wrong credentials")
         }
         return await prismaClient.user.delete({
-            where: { id: userId, password: oldPass },
+            where: { id: userId, email },
         })
     }
 }
