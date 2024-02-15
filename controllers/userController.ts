@@ -75,7 +75,7 @@ class UserController {
     async deleteUser(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number(req.params.id)
-            const userData = await userService.deleteUser(userId, (req as any).user.email)
+            const userData = await userService.deleteUser(userId, (res as any).user.email)
             return res.json("User has been deleted")
         } catch (e) {
             next(e)
@@ -84,7 +84,7 @@ class UserController {
     async getById(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number(req.params.id)
-            const user = await userService.getById(userId, (req as any).user.email)
+            const user = await userService.getById(userId, (res as any).user.email)
             return res.json(user)
         } catch (e) {
             next(e)

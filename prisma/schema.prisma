@@ -30,14 +30,14 @@ model Board {
   description String?
   creatorId   Int
   columns     Column[]
-  users       User[]
+  users       User[] 
 }
 
 model Column {
   id      Int    @id @default(autoincrement())
   name    String
   order   Int
-  board   Board  @relation(fields: [boardId], references: [id])
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId Int
   tasks   Task[]
 }
@@ -49,6 +49,6 @@ model Task {
   users        User[]
   creationDate DateTime
   moveDate     DateTime
-  Column       Column   @relation(fields: [columnId], references: [id])
+  Column       Column   @relation(fields: [columnId], references: [id], onDelete: Cascade)
   columnId     Int
 }

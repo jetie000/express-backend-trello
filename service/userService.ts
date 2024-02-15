@@ -78,7 +78,7 @@ class UserService {
             access: userToFind.access
         })
         tokenService.saveToken(userToFind.id, tokens.refreshToken)
-        return { ...tokens, email }
+        return { ...tokens, email, id: userToFind.id }
     }
 
     async logout(refreshToken: string) {
