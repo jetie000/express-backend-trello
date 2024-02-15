@@ -34,7 +34,7 @@ class BoardService {
         return board
     }
 
-    async updateBoard(name: string, description: string, boardId: number) {
+    async updateBoard(name: string, description: string, boardId: number, userIds: number[]) {
         const boardToFind = await prismaClient.board.findFirst({
             where: {
                 id: boardId
@@ -44,61 +44,16 @@ class BoardService {
             throw ApiError.BadRequest(`Board with id ${boardId} doesn't exist`)
 
         const board = await prismaClient.board.update({
-            where: {id: boardId},
+            where: { id: boardId },
             data: {
                 name,
-                description
+                description,
+                users: {
+                    connect: userIds.map(id => ({ id: id }))
+                }
             }
         })
         return board
-    }
-
-    async addUser(boardId: number, userId: number, email: string){
-        const userDB = await prismaClient.user.findUnique({
-            where: {
-                email
-            }
-        })
-        if (!userDB) {
-            throw ApiError.BadRequest("Wrong credentials")
-        }
-        return await prismaClient.board.update({
-            where: { 
-                id: boardId,
-                creatorId: userDB.id
-            },
-            data: {
-                users: {
-                    connect: {
-                        id: userId
-                    }
-                }
-            }
-        })
-    }
-
-    async removeUser(boardId: number, userId: number, email: string){
-        const userDB = await prismaClient.user.findUnique({
-            where: {
-                email
-            }
-        })
-        if (!userDB) {
-            throw ApiError.BadRequest("Wrong credentials")
-        }
-        return await prismaClient.board.update({
-            where: { 
-                id: boardId,
-                creatorId: userDB.id
-            },
-            data: {
-                users: {
-                    disconnect: {
-                        id: userId
-                    }
-                }
-            }
-        })
     }
 
     async deleteBoard(boardId: number, email: string) {
@@ -125,6 +80,30 @@ class BoardService {
                 users: {
                     some: {
                         email
+                    }
+                }
+            },
+            include: {
+                columns: {
+                    include: {
+                        tasks: {
+                            include: {
+                                users: {
+                                    select: {
+                                        email: true,
+                                        fullName: true,
+                                        loginDate: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                users: {
+                    select: {
+                        email: true,
+                        fullName: true,
+                        loginDate: true
                     }
                 }
             }

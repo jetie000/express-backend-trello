@@ -18,19 +18,21 @@ class BoardController {
             next(e)
         }
     }
+    
     async updateBoard(req: Request, res: Response, next: NextFunction) {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return next(ApiError.BadRequest("Validation Error", errors.array()))
             }
-            const { id, name, description } = req.body
-            const boardData = await boardService.updateBoard(name, description, id)
+            const { id, name, description, userIds } = req.body
+            const boardData = await boardService.updateBoard(name, description, id, userIds)
             return res.json(boardData)
         } catch (e) {
             next(e)
         }
     }
+
     async deleteBoard(req: Request, res: Response, next: NextFunction) {
         try {
             const boardId = Number(req.params.id)
@@ -41,26 +43,6 @@ class BoardController {
         }
     }
     
-    async addUser(req: Request, res: Response, next: NextFunction) {
-        try {
-            const boardId = Number(req.params.id)
-            const userId = Number(req.params.userId)
-            const board = await boardService.addUser(boardId, userId, (res as any).user.email)
-            return res.json(board)
-        } catch (e) {
-            next(e)
-        }
-    }
-    async removeUser(req: Request, res: Response, next: NextFunction) {
-        try {
-            const boardId = Number(req.params.id)
-            const userId = Number(req.params.userId)
-            const board = await boardService.removeUser(boardId, userId, (res as any).user.email)
-            return res.json(board)
-        } catch (e) {
-            next(e)
-        }
-    }
     async getById(req: Request, res: Response, next: NextFunction) {
         try {
             const boardId = Number(req.params.id)
@@ -70,6 +52,7 @@ class BoardController {
             next(e)
         }
     }
+
     async getByUserId(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number(req.params.id)

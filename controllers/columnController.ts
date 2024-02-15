@@ -1,7 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import { ApiError } from "../exceptions/apiError";
-import boardService from "../service/boardService";
 import columnService from "../service/columnService";
 
 class ColumnController {

@@ -3,6 +3,8 @@ import userController from "../controllers/userController";
 import { body } from "express-validator";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import boardController from "../controllers/boardController";
+import columnController from "../controllers/columnController";
+import taskController from "../controllers/taskController";
 
 const router = Router()
 
@@ -34,8 +36,26 @@ router.put('/board', authMiddleware,
     boardController.updateBoard)
 router.delete('/board/:id', authMiddleware, boardController.deleteBoard)
 router.get('/board/user/:id', authMiddleware, boardController.getByUserId)
-router.get('/board/:id/addUser/:userId', authMiddleware, boardController.addUser)
-router.get('/board/:id/removeUser/:userId', authMiddleware, boardController.removeUser)
+
+router.post('/column', authMiddleware,
+    body('name').trim().isLength({ min: 3, max: 30 }),
+    columnController.addColumn)
+router.put('/column', authMiddleware,
+    body('name').trim().isLength({ min: 3, max: 30 }),
+    body('order').trim().isInt(),
+    columnController.updateColumn)
+router.delete('/column/:id', authMiddleware, columnController.deleteColumn)
+
+router.post('/task', authMiddleware,
+    body('name').trim().isLength({ min: 3, max: 30 }),
+    body('userIds').isArray(),
+    taskController.addTask)
+router.put('/task', authMiddleware,
+    body('name').trim().isLength({ min: 3, max: 30 }),
+    body('userIds').isArray(),
+    taskController.updateTask)
+router.delete('/task/:id/board/:boardId', authMiddleware, taskController.deleteTask)
+
 
 
 export default router;
