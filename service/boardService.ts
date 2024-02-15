@@ -53,6 +53,54 @@ class BoardService {
         return board
     }
 
+    async addUser(boardId: number, userId: number, email: string){
+        const userDB = await prismaClient.user.findUnique({
+            where: {
+                email
+            }
+        })
+        if (!userDB) {
+            throw ApiError.BadRequest("Wrong credentials")
+        }
+        return await prismaClient.board.update({
+            where: { 
+                id: boardId,
+                creatorId: userDB.id
+            },
+            data: {
+                users: {
+                    connect: {
+                        id: userId
+                    }
+                }
+            }
+        })
+    }
+
+    async removeUser(boardId: number, userId: number, email: string){
+        const userDB = await prismaClient.user.findUnique({
+            where: {
+                email
+            }
+        })
+        if (!userDB) {
+            throw ApiError.BadRequest("Wrong credentials")
+        }
+        return await prismaClient.board.update({
+            where: { 
+                id: boardId,
+                creatorId: userDB.id
+            },
+            data: {
+                users: {
+                    disconnect: {
+                        id: userId
+                    }
+                }
+            }
+        })
+    }
+
     async deleteBoard(boardId: number, email: string) {
         const userDB = await prismaClient.user.findUnique({
             where: {
