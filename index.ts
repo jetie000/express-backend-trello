@@ -53,3 +53,5 @@ const run = () => {
   }
 }
 run()
+
+export default app;
