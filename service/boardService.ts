@@ -3,7 +3,7 @@ import { ApiError } from "../exceptions/apiError";
 
 class BoardService {
 
-    async addBoard(name: string, description: string, creatorId: number) {
+    async addBoard(name: string, description: string, creatorId: number, userIds: number[]) {
         const userToFind = await prismaClient.user.findFirst({
             where: {
                 id: creatorId
@@ -11,14 +11,16 @@ class BoardService {
         })
         if (!userToFind)
             throw ApiError.BadRequest(`User with id ${creatorId} doesn't exist`)
-
+        const userIdsToConnect = userIds.slice()
+        if(!userIdsToConnect.find(id => id === creatorId))
+            userIdsToConnect.push(creatorId)
         const board = await prismaClient.board.create({
             data: {
                 name,
                 description,
                 creatorId,
                 users: {
-                    connect: [userToFind]
+                    connect: userIdsToConnect.map(id => ({ id: id }))
                 },
                 columns: {
                     createMany: {

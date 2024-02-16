@@ -124,6 +124,7 @@ class UserService {
                 }
             },
             select: {
+                id: true,
                 email: true,
                 fullName: true,
                 loginDate: true,
@@ -201,6 +202,7 @@ class UserService {
                 ]
             },
             select: {
+                id: true,
                 email: true,
                 fullName: true,
                 loginDate: true,

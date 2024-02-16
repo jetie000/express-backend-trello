@@ -19,6 +19,7 @@ router.get('/auth/activate/:link', userController.activate)
 router.get('/auth/refresh', userController.refresh)
 
 router.get('/user/:id', authMiddleware, userController.getById)
+router.get('/user/getByIds/:ids', authMiddleware, userController.getByIds)
 router.put('/user',
     body('email').isEmail(),
     body('password').trim().isLength({ min: 8, max: 30 }),

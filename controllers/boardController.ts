@@ -11,8 +11,8 @@ class BoardController {
             if (!errors.isEmpty()) {
                 return next(ApiError.BadRequest("Validation Error", errors.array()))
             }
-            const { name, description, creatorId } = req.body
-            const boardData = await boardService.addBoard(name, description, creatorId)
+            const { name, description, creatorId, userIds } = req.body
+            const boardData = await boardService.addBoard(name, description, creatorId, userIds)
             return res.json(boardData)
         } catch (e) {
             next(e)
