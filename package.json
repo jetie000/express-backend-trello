@@ -5,7 +5,10 @@
   "main": "index.ts",
   "scripts": {
     "serve": "nodemon -x ts-node index.ts",
-    "start": "ts-node index.ts"
+    "start": "ts-node index.ts",
+    "build": "rimraf dist && tsc",
+    "ts.check": "tsc --project tsconfig.json",
+    "add-build": "git add dist"
   },
   "author": "",
   "license": "ISC",
@@ -40,5 +43,10 @@
     "prisma": "^5.9.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
-  }
+  },
+  "pre-commit": [
+    "ts.check",
+    "build",
+    "add-build"
+  ]
 }
