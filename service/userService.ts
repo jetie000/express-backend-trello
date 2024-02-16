@@ -187,6 +187,28 @@ class UserService {
             where: { id: userId, email },
         })
     }
+
+    async searchUsers(search: string) {
+        return await prismaClient.user.findMany({
+            where: {
+                OR: [
+                    {
+                        email: { contains: search }
+                    },
+                    {
+                        fullName: { contains: search }
+                    }
+                ]
+            },
+            select: {
+                email: true,
+                fullName: true,
+                loginDate: true,
+                boardsPartipated: true,
+                tasksParticipated: true
+            }
+        })
+    }
 }
 
 export default new UserService()

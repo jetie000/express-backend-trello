@@ -99,6 +99,15 @@ class UserController {
             next(e)
         }
     }
+    async searchUsers(req: Request, res: Response, next: NextFunction) {
+        try {
+            const search = req.params.search
+            const users = await userService.searchUsers(search)
+            return res.json(users)
+        } catch (e) {
+            next(e)
+        }
+    }
 }
 
 export default new UserController()

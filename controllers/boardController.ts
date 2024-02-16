@@ -37,7 +37,7 @@ class BoardController {
         try {
             const boardId = Number(req.params.id)
             const boardData = await boardService.deleteBoard(boardId, (res as any).user.email)
-            return res.json("Board has been deleted")
+            return res.json(boardData)
         } catch (e) {
             next(e)
         }

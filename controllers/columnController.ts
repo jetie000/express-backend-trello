@@ -35,7 +35,7 @@ class ColumnController {
         try {
             const columnId = Number(req.params.id)
             const columnData = await columnService.deleteColumn(columnId, (res as any).user.email)
-            return res.json("Column has been deleted")
+            return res.json(columnData)
         } catch (e) {
             next(e)
         }

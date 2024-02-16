@@ -1,7 +1,7 @@
 import { Router } from "express";
-import userController from "../controllers/userController";
 import { body } from "express-validator";
 import { authMiddleware } from "../middlewares/authMiddleware";
+import userController from "../controllers/userController";
 import boardController from "../controllers/boardController";
 import columnController from "../controllers/columnController";
 import taskController from "../controllers/taskController";
@@ -26,6 +26,7 @@ router.put('/user',
     authMiddleware,
     userController.updateUser)
 router.delete('/user/:id', authMiddleware, userController.deleteUser)
+router.get('/user/search/:search', authMiddleware, userController.searchUsers)
 
 router.get('/board/:id', authMiddleware, boardController.getById)
 router.post('/board', authMiddleware,
