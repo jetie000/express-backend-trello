@@ -12,7 +12,7 @@ class BoardService {
         if (!userToFind)
             throw ApiError.BadRequest(`User with id ${creatorId} doesn't exist`)
         const userIdsToConnect = userIds.slice()
-        if(!userIdsToConnect.find(id => id === creatorId))
+        if (!userIdsToConnect.find(id => id === creatorId))
             userIdsToConnect.push(creatorId)
         const board = await prismaClient.board.create({
             data: {
@@ -36,7 +36,13 @@ class BoardService {
         return board
     }
 
-    async updateBoard(name: string, description: string, boardId: number, userIds: number[]) {
+    async updateBoard(name: string, description: string, boardId: number, userIds: number[], email: string) {
+        const userToFind = await prismaClient.user.findUnique({
+            where: { email }
+        })
+        if (!userToFind)
+            throw ApiError.BadRequest(`User with email ${email} doesn't exist`)
+
         const boardToFind = await prismaClient.board.findFirst({
             where: {
                 id: boardId
@@ -44,6 +50,8 @@ class BoardService {
         })
         if (!boardToFind)
             throw ApiError.BadRequest(`Board with id ${boardId} doesn't exist`)
+        if (boardToFind.creatorId !== userToFind.id)
+            throw ApiError.BadRequest(`You're not the creator of that board`)
 
         const board = await prismaClient.board.update({
             where: { id: boardId },
@@ -103,6 +111,7 @@ class BoardService {
                 },
                 users: {
                     select: {
+                        id: true,
                         email: true,
                         fullName: true,
                         loginDate: true
@@ -119,6 +128,16 @@ class BoardService {
                     some: {
                         id: userId,
                         email
+                    }
+                }
+            },
+            include: {
+                users: {
+                    select: {
+                        id: true,
+                        email: true,
+                        fullName: true,
+                        loginDate: true
                     }
                 }
             }
