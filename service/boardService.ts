@@ -46,20 +46,28 @@ class BoardService {
         const boardToFind = await prismaClient.board.findFirst({
             where: {
                 id: boardId
+            },
+            include: {
+                users: {
+                    select: { id: true }
+                }
             }
         })
         if (!boardToFind)
             throw ApiError.BadRequest(`Board with id ${boardId} doesn't exist`)
         if (boardToFind.creatorId !== userToFind.id)
             throw ApiError.BadRequest(`You're not the creator of that board`)
-
+        const userIdsChecked = userIds.find(u => u === userToFind.id)
+            ? userIds.map(id => ({ id: id }))
+            : userIds.map(id => ({ id: id })).concat({ id: userToFind.id })
         const board = await prismaClient.board.update({
             where: { id: boardId },
             data: {
                 name,
                 description,
                 users: {
-                    connect: userIds.map(id => ({ id: id }))
+                    disconnect: boardToFind.users,
+                    connect: userIdsChecked
                 }
             }
         })
@@ -79,6 +87,27 @@ class BoardService {
             where: {
                 id: boardId,
                 creatorId: userDB.id
+            }
+        })
+    }
+
+    async leaveBoard(boardId: number, email: string) {
+        const userDB = await prismaClient.user.findUnique({
+            where: {
+                email
+            }
+        })
+        if (!userDB) {
+            throw ApiError.BadRequest("Wrong credentials")
+        }
+        return await prismaClient.board.update({
+            where: {
+                id: boardId
+            },
+            data: {
+                users: {
+                    disconnect: {id: userDB.id}
+                }
             }
         })
     }

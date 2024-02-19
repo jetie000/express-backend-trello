@@ -42,6 +42,16 @@ class BoardController {
             next(e)
         }
     }
+
+    async leaveBoard(req: Request, res: Response, next: NextFunction) {
+        try {
+            const boardId = Number(req.params.id)
+            const boardData = await boardService.leaveBoard(boardId, (res as any).user.email)
+            return res.json(boardData)
+        } catch (e) {
+            next(e)
+        }
+    }
     
     async getById(req: Request, res: Response, next: NextFunction) {
         try {
