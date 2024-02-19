@@ -46,7 +46,12 @@ class TaskService {
         if (!boardToFind)
             throw ApiError.BadRequest(`Board with column id ${columnId} doesn't exist`)
         const taskToFind = await prismaClient.task.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                users: {
+                    select: { id: true }
+                }
+            }
         })
         if (!taskToFind)
             throw ApiError.BadRequest(`Task with id ${columnId} doesn't exist`)
@@ -57,6 +62,7 @@ class TaskService {
                 name,
                 description,
                 users: {
+                    disconnect: taskToFind.users,
                     connect: userIds.map(id => ({ id: id }))
                 },
                 moveDate,

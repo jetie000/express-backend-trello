@@ -25,7 +25,7 @@ class ColumnController {
                 return next(ApiError.BadRequest("Validation Error", errors.array()))
             }
             const { id, name, order } = req.body
-            const columnData = await columnService.updateColumn(name, order, id, (res as any).user.email)
+            const columnData = await columnService.updateColumn(name, Number(order), id, (res as any).user.email)
             return res.json(columnData)
         } catch (e) {
             next(e)

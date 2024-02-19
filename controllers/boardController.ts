@@ -26,7 +26,7 @@ class BoardController {
                 return next(ApiError.BadRequest("Validation Error", errors.array()))
             }
             const { id, name, description, userIds } = req.body
-            const boardData = await boardService.updateBoard(name, description, id, userIds)
+            const boardData = await boardService.updateBoard(name, description, id, userIds, (res as any).user.email)
             return res.json(boardData)
         } catch (e) {
             next(e)
@@ -37,6 +37,16 @@ class BoardController {
         try {
             const boardId = Number(req.params.id)
             const boardData = await boardService.deleteBoard(boardId, (res as any).user.email)
+            return res.json(boardData)
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    async leaveBoard(req: Request, res: Response, next: NextFunction) {
+        try {
+            const boardId = Number(req.params.id)
+            const boardData = await boardService.leaveBoard(boardId, (res as any).user.email)
             return res.json(boardData)
         } catch (e) {
             next(e)

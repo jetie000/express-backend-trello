@@ -37,6 +37,7 @@ router.put('/board', authMiddleware,
     body('name').trim().isLength({ min: 3, max: 30 }),
     boardController.updateBoard)
 router.delete('/board/:id', authMiddleware, boardController.deleteBoard)
+router.post('/board/:id/leave', authMiddleware, boardController.leaveBoard)
 router.get('/board/user/:id', authMiddleware, boardController.getByUserId)
 
 router.post('/column', authMiddleware,
