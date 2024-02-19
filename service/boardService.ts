@@ -129,6 +129,7 @@ class BoardService {
                             include: {
                                 users: {
                                     select: {
+                                        id: true,
                                         email: true,
                                         fullName: true,
                                         loginDate: true
