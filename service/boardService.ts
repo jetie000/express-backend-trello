@@ -106,7 +106,7 @@ class BoardService {
             },
             data: {
                 users: {
-                    disconnect: {id: userDB.id}
+                    disconnect: { id: userDB.id }
                 }
             }
         })
@@ -135,9 +135,11 @@ class BoardService {
                                         loginDate: true
                                     }
                                 }
-                            }
-                        }
-                    }
+                            },
+                            orderBy: { moveDate: 'desc'}
+                        },
+                    },
+                    orderBy: { order: 'asc' }
                 },
                 users: {
                     select: {
