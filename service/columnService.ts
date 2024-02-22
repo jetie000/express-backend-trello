@@ -8,13 +8,13 @@ class ColumnService {
         id: boardId,
         users: {
           some: {
-            email,
-          },
-        },
+            email
+          }
+        }
       },
       include: {
-        columns: true,
-      },
+        columns: true
+      }
     })
     if (!boardToFind)
       throw ApiError.BadRequest(`Board with id ${boardId} doesn't exist`)
@@ -25,10 +25,10 @@ class ColumnService {
         order: boardToFind.columns.length + 1,
         board: {
           connect: {
-            id: boardId,
-          },
-        },
-      },
+            id: boardId
+          }
+        }
+      }
     })
     return column
   }
@@ -37,20 +37,20 @@ class ColumnService {
     const boardToFind = await prismaClient.board.findFirst({
       where: {
         columns: {
-          some: { id },
+          some: { id }
         },
         users: {
-          some: { email },
-        },
+          some: { email }
+        }
       },
       include: {
-        columns: true,
-      },
+        columns: true
+      }
     })
     if (!boardToFind)
       throw ApiError.BadRequest(`Board with column id ${id} doesn't exist`)
 
-    const oldOrder = boardToFind.columns.find((c) => c.id === id)?.order
+    const oldOrder = boardToFind.columns.find(c => c.id === id)?.order
     if (oldOrder && oldOrder !== order) {
       if (oldOrder < order) {
         await prismaClient.column.updateMany({
@@ -58,12 +58,12 @@ class ColumnService {
             boardId: boardToFind.id,
             order: {
               gt: oldOrder,
-              lte: order,
-            },
+              lte: order
+            }
           },
           data: {
-            order: { decrement: 1 },
-          },
+            order: { decrement: 1 }
+          }
         })
       } else {
         await prismaClient.column.updateMany({
@@ -71,12 +71,12 @@ class ColumnService {
             boardId: boardToFind.id,
             order: {
               gte: order,
-              lt: oldOrder,
-            },
+              lt: oldOrder
+            }
           },
           data: {
-            order: { increment: 1 },
-          },
+            order: { increment: 1 }
+          }
         })
       }
     }
@@ -84,8 +84,8 @@ class ColumnService {
       where: { id },
       data: {
         name,
-        order,
-      },
+        order
+      }
     })
     return column
   }
@@ -94,18 +94,18 @@ class ColumnService {
     const boardToFind = await prismaClient.board.findFirst({
       where: {
         columns: {
-          some: { id },
+          some: { id }
         },
         users: {
-          some: { email },
-        },
-      },
+          some: { email }
+        }
+      }
     })
     if (!boardToFind) {
       throw ApiError.BadRequest(`Board with column id ${id} doesn't exist`)
     }
     return await prismaClient.column.delete({
-      where: { id },
+      where: { id }
     })
   }
 }

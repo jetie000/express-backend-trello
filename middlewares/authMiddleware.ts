@@ -18,8 +18,8 @@ export async function authMiddleware(
     if (!userJwtData) return next(ApiError.UnauthorizedError())
     const user = await prismaClient.user.findFirst({
       where: {
-        email: (userJwtData as UserJwtPayload).email,
-      },
+        email: (userJwtData as UserJwtPayload).email
+      }
     })
     if (user) (res as any).user = user
     next()

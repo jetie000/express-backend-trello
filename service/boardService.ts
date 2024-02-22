@@ -10,13 +10,13 @@ class BoardService {
   ) {
     const userToFind = await prismaClient.user.findFirst({
       where: {
-        id: creatorId,
-      },
+        id: creatorId
+      }
     })
     if (!userToFind)
       throw ApiError.BadRequest(`User with id ${creatorId} doesn't exist`)
     const userIdsToConnect = userIds.slice()
-    if (!userIdsToConnect.find((id) => id === creatorId))
+    if (!userIdsToConnect.find(id => id === creatorId))
       userIdsToConnect.push(creatorId)
     const board = await prismaClient.board.create({
       data: {
@@ -24,18 +24,18 @@ class BoardService {
         description,
         creatorId,
         users: {
-          connect: userIdsToConnect.map((id) => ({ id: id })),
+          connect: userIdsToConnect.map(id => ({ id: id }))
         },
         columns: {
           createMany: {
             data: [
               { name: "To do", order: 1 },
               { name: "In process", order: 2 },
-              { name: "Done", order: 3 },
-            ],
-          },
-        },
-      },
+              { name: "Done", order: 3 }
+            ]
+          }
+        }
+      }
     })
     return board
   }
@@ -48,28 +48,28 @@ class BoardService {
     email: string
   ) {
     const userToFind = await prismaClient.user.findUnique({
-      where: { email },
+      where: { email }
     })
     if (!userToFind)
       throw ApiError.BadRequest(`User with email ${email} doesn't exist`)
 
     const boardToFind = await prismaClient.board.findFirst({
       where: {
-        id: boardId,
+        id: boardId
       },
       include: {
         users: {
-          select: { id: true },
-        },
-      },
+          select: { id: true }
+        }
+      }
     })
     if (!boardToFind)
       throw ApiError.BadRequest(`Board with id ${boardId} doesn't exist`)
     if (boardToFind.creatorId !== userToFind.id)
       throw ApiError.BadRequest(`You're not the creator of that board`)
-    const userIdsChecked = userIds.find((u) => u === userToFind.id)
-      ? userIds.map((id) => ({ id: id }))
-      : userIds.map((id) => ({ id: id })).concat({ id: userToFind.id })
+    const userIdsChecked = userIds.find(u => u === userToFind.id)
+      ? userIds.map(id => ({ id: id }))
+      : userIds.map(id => ({ id: id })).concat({ id: userToFind.id })
     const board = await prismaClient.board.update({
       where: { id: boardId },
       data: {
@@ -77,9 +77,9 @@ class BoardService {
         description,
         users: {
           disconnect: boardToFind.users,
-          connect: userIdsChecked,
-        },
-      },
+          connect: userIdsChecked
+        }
+      }
     })
     return board
   }
@@ -87,8 +87,8 @@ class BoardService {
   async deleteBoard(boardId: number, email: string) {
     const userDB = await prismaClient.user.findUnique({
       where: {
-        email,
-      },
+        email
+      }
     })
     if (!userDB) {
       throw ApiError.BadRequest("Wrong credentials")
@@ -96,29 +96,29 @@ class BoardService {
     return await prismaClient.board.delete({
       where: {
         id: boardId,
-        creatorId: userDB.id,
-      },
+        creatorId: userDB.id
+      }
     })
   }
 
   async leaveBoard(boardId: number, email: string) {
     const userDB = await prismaClient.user.findUnique({
       where: {
-        email,
-      },
+        email
+      }
     })
     if (!userDB) {
       throw ApiError.BadRequest("Wrong credentials")
     }
     return await prismaClient.board.update({
       where: {
-        id: boardId,
+        id: boardId
       },
       data: {
         users: {
-          disconnect: { id: userDB.id },
-        },
-      },
+          disconnect: { id: userDB.id }
+        }
+      }
     })
   }
 
@@ -128,9 +128,9 @@ class BoardService {
         id: boardId,
         users: {
           some: {
-            email,
-          },
-        },
+            email
+          }
+        }
       },
       include: {
         columns: {
@@ -142,24 +142,24 @@ class BoardService {
                     id: true,
                     email: true,
                     fullName: true,
-                    loginDate: true,
-                  },
-                },
+                    loginDate: true
+                  }
+                }
               },
-              orderBy: { moveDate: "desc" },
-            },
+              orderBy: { moveDate: "desc" }
+            }
           },
-          orderBy: { order: "asc" },
+          orderBy: { order: "asc" }
         },
         users: {
           select: {
             id: true,
             email: true,
             fullName: true,
-            loginDate: true,
-          },
-        },
-      },
+            loginDate: true
+          }
+        }
+      }
     })
   }
 
@@ -169,9 +169,9 @@ class BoardService {
         users: {
           some: {
             id: userId,
-            email,
-          },
-        },
+            email
+          }
+        }
       },
       include: {
         users: {
@@ -179,10 +179,10 @@ class BoardService {
             id: true,
             email: true,
             fullName: true,
-            loginDate: true,
-          },
-        },
-      },
+            loginDate: true
+          }
+        }
+      }
     })
   }
 }

@@ -10,8 +10,8 @@ class MailService {
       secure: false,
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
+        pass: process.env.SMTP_PASSWORD
+      }
     })
   }
   async sendActivationMail(email: string, activationLink: string) {
@@ -25,7 +25,7 @@ class MailService {
                     <h1>Для активации аккаунта перейдите по ссылке</h1>
                     <a href="${activationLink}">${activationLink}</a>
                 </div>
-            `,
+            `
     })
   }
 }

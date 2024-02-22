@@ -12,12 +12,12 @@ class TaskService {
     const boardToFind = await prismaClient.board.findFirst({
       where: {
         columns: {
-          some: { id: columnId },
+          some: { id: columnId }
         },
         users: {
-          some: { email },
-        },
-      },
+          some: { email }
+        }
+      }
     })
     if (!boardToFind)
       throw ApiError.BadRequest(
@@ -29,12 +29,12 @@ class TaskService {
         name,
         description,
         users: {
-          connect: userIds.map((id) => ({ id: id })),
+          connect: userIds.map(id => ({ id: id }))
         },
         creationDate: new Date(),
         moveDate: new Date(),
-        columnId,
-      },
+        columnId
+      }
     })
     return task
   }
@@ -50,12 +50,12 @@ class TaskService {
     const boardToFind = await prismaClient.board.findFirst({
       where: {
         columns: {
-          some: { id: columnId },
+          some: { id: columnId }
         },
         users: {
-          some: { email },
-        },
-      },
+          some: { email }
+        }
+      }
     })
     if (!boardToFind)
       throw ApiError.BadRequest(
@@ -65,9 +65,9 @@ class TaskService {
       where: { id },
       include: {
         users: {
-          select: { id: true },
-        },
-      },
+          select: { id: true }
+        }
+      }
     })
     if (!taskToFind)
       throw ApiError.BadRequest(`Task with id ${columnId} doesn't exist`)
@@ -80,11 +80,11 @@ class TaskService {
         description,
         users: {
           disconnect: taskToFind.users,
-          connect: userIds.map((id) => ({ id: id })),
+          connect: userIds.map(id => ({ id: id }))
         },
         moveDate,
-        columnId,
-      },
+        columnId
+      }
     })
     return task
   }
@@ -94,15 +94,15 @@ class TaskService {
       where: {
         id: boardId,
         users: {
-          some: { email },
-        },
-      },
+          some: { email }
+        }
+      }
     })
     if (!boardToFind) {
       throw ApiError.BadRequest(`Board with id ${boardId} doesn't exist`)
     }
     return await prismaClient.task.delete({
-      where: { id },
+      where: { id }
     })
   }
 }

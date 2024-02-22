@@ -9,8 +9,8 @@ class UserService {
   async register(email: string, password: string, fullName: string) {
     const userToFind = await prismaClient.user.findFirst({
       where: {
-        email: email,
-      },
+        email: email
+      }
     })
     if (userToFind)
       throw ApiError.BadRequest(`User with ${email} already exists`)
@@ -19,7 +19,7 @@ class UserService {
     const activationLinkId = v4()
     const tokens = tokenService.generateTokens({
       email,
-      access: false,
+      access: false
     })
 
     await prismaClient.user.create({
@@ -30,8 +30,8 @@ class UserService {
         joinDate: new Date(),
         loginDate: new Date(),
         activationLink: activationLinkId,
-        refreshToken: tokens.refreshToken,
-      },
+        refreshToken: tokens.refreshToken
+      }
     })
     await mailService.sendActivationMail(
       email,
@@ -44,27 +44,27 @@ class UserService {
   async activate(activationLink: string) {
     const user = await prismaClient.user.findFirst({
       where: {
-        activationLink,
-      },
+        activationLink
+      }
     })
     if (!user) {
       throw ApiError.BadRequest("Incorrect activation link")
     }
     await prismaClient.user.updateMany({
       where: {
-        activationLink,
+        activationLink
       },
       data: {
-        access: true,
-      },
+        access: true
+      }
     })
   }
 
   async login(email: string, password: string) {
     const userToFind = await prismaClient.user.findFirst({
       where: {
-        email: email,
-      },
+        email: email
+      }
     })
     if (!userToFind) throw ApiError.BadRequest(`User with ${email} not found`)
     const isEqual = compare(password, userToFind.password)
@@ -74,11 +74,11 @@ class UserService {
     }
     const tokens = tokenService.generateTokens({
       email,
-      access: userToFind.access,
+      access: userToFind.access
     })
     await prismaClient.user.update({
       where: { id: userToFind.id },
-      data: { loginDate: new Date() },
+      data: { loginDate: new Date() }
     })
     tokenService.saveToken(userToFind.id, tokens.refreshToken)
     return { ...tokens, email, id: userToFind.id }
@@ -98,7 +98,7 @@ class UserService {
 
     const tokens = tokenService.generateTokens({
       email: userFromDB.email,
-      access: userFromDB.access,
+      access: userFromDB.access
     })
     tokenService.saveToken(userFromDB.id, tokens.refreshToken)
     return { ...tokens, email: userFromDB.email }
@@ -108,18 +108,18 @@ class UserService {
     return await prismaClient.user.findFirst({
       where: {
         id: userId,
-        email,
-      },
+        email
+      }
     })
   }
 
   async getByIds(ids: string) {
-    const idsArr = ids.split("_").map((el) => Number(el))
+    const idsArr = ids.split("_").map(el => Number(el))
     const users = await prismaClient.user.findMany({
       where: {
         id: {
-          in: idsArr,
-        },
+          in: idsArr
+        }
       },
       select: {
         id: true,
@@ -127,8 +127,8 @@ class UserService {
         fullName: true,
         loginDate: true,
         boardsPartipated: true,
-        tasksParticipated: true,
-      },
+        tasksParticipated: true
+      }
     })
     return users
   }
@@ -141,14 +141,14 @@ class UserService {
     oldPassword: string
   ) {
     const userToFind = await prismaClient.user.findFirst({
-      where: { email: email },
+      where: { email: email }
     })
     if (userToFind)
       throw ApiError.BadRequest(`User with ${email} already exists`)
 
     const oldPass = await hash(oldPassword, 5)
     const userThis = await prismaClient.user.findFirst({
-      where: { id, password: oldPass },
+      where: { id, password: oldPass }
     })
     if (!userThis)
       throw ApiError.BadRequest(
@@ -159,12 +159,12 @@ class UserService {
     const activationLinkId = v4()
     const tokens = tokenService.generateTokens({
       email,
-      access: false,
+      access: false
     })
 
     await prismaClient.user.update({
       where: {
-        id: id,
+        id: id
       },
       data: {
         email,
@@ -172,8 +172,8 @@ class UserService {
         password: hashPassword,
         activationLink: activationLinkId,
         access,
-        refreshToken: tokens.refreshToken,
-      },
+        refreshToken: tokens.refreshToken
+      }
     })
     if (!access)
       await mailService.sendActivationMail(
@@ -187,14 +187,14 @@ class UserService {
     const userDB = await prismaClient.user.findUnique({
       where: {
         id: userId,
-        email,
-      },
+        email
+      }
     })
     if (!userDB) {
       throw ApiError.BadRequest("Wrong credentials")
     }
     return await prismaClient.user.delete({
-      where: { id: userId, email },
+      where: { id: userId, email }
     })
   }
 
@@ -203,12 +203,12 @@ class UserService {
       where: {
         OR: [
           {
-            email: { contains: search },
+            email: { contains: search }
           },
           {
-            fullName: { contains: search },
-          },
-        ],
+            fullName: { contains: search }
+          }
+        ]
       },
       select: {
         id: true,
@@ -216,8 +216,8 @@ class UserService {
         fullName: true,
         loginDate: true,
         boardsPartipated: true,
-        tasksParticipated: true,
-      },
+        tasksParticipated: true
+      }
     })
   }
 }

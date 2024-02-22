@@ -5,27 +5,27 @@ import { UserJwtPayload } from "../types/userJwtPayload"
 class TokenService {
   generateTokens(payload: UserJwtPayload) {
     const accessToken = sign(payload, process.env.JWT_SECRET!, {
-      expiresIn: "30m",
+      expiresIn: "30m"
     })
     const refreshToken = sign(payload, process.env.JWT_REFRESH_SECRET!, {
-      expiresIn: "60d",
+      expiresIn: "60d"
     })
     return {
       accessToken,
-      refreshToken,
+      refreshToken
     }
   }
 
   async saveToken(userId: number, refreshToken: string) {
     await prismaClient.user.update({
       where: { id: userId },
-      data: { refreshToken: refreshToken },
+      data: { refreshToken: refreshToken }
     })
   }
   async removeToken(refreshToken: string) {
     await prismaClient.user.updateMany({
       where: { refreshToken: refreshToken },
-      data: { refreshToken: undefined },
+      data: { refreshToken: undefined }
     })
   }
 
@@ -49,7 +49,7 @@ class TokenService {
 
   async findByToken(token: string) {
     return await prismaClient.user.findFirst({
-      where: { refreshToken: token },
+      where: { refreshToken: token }
     })
   }
 }
