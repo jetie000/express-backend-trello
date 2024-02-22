@@ -3,28 +3,42 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { config } from "dotenv";
 import router from "./router/router";
-import { prismaClient } from "./prisma/prismaService";
 import { errorMiddleware } from "./middlewares/errorMiddlewares";
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from "swagger-jsdoc";
+import {version} from './package.json'
 
 config()
 
-const options = {
-  swaggerDefinition: {
-    restapi: '3.0.0',
+const options: swaggerJsdoc.Options = {
+  definition: {
+    openapi: '3.0.0',
     info: {
       title: 'Trello Clone API',
-      version: '1.0.0',
+      version,
       description: 'My REST API',
     },
+    components: {
+      securitySchemas:{
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: "JWT"
+        } 
+      }
+    },
+    security: [
+      {
+        bearerAuth: []
+      }
+    ],
     servers: [
       {
         url: 'http://localhost:8080',
       },
     ],
   },
-  apis: ['**/*.ts'],
+  apis: ['./router/router.ts'],
 }
 
 const specs = swaggerJsdoc(options)
