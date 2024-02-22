@@ -1,4 +1,4 @@
 export interface UserJwtPayload {
-    email: string
-    access: boolean
+  email: string
+  access: boolean
 }

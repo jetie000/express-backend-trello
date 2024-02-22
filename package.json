@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "serve": "nodemon -x ts-node index.ts",
-    "start": "ts-node index.ts"
+    "dev": "nodemon -x ts-node index.ts",
+    "start": "ts-node index.ts",
+    "lint": "npx eslint ./",
+    "format": "npx eslint ./ --fix"
   },
   "author": "",
   "license": "ISC",
@@ -36,7 +38,12 @@
     "@types/swagger-ui-express": "^4.1.6",
     "@types/uuid": "^9.0.8",
     "@types/yamljs": "^0.2.34",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "eslint": "^8.56.0",
     "nodemon": "^3.0.3",
+    "prettier": "^3.2.5",
+    "prettier-eslint": "^16.3.0",
     "prisma": "^5.9.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"

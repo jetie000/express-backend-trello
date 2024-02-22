@@ -1,3 +1,3 @@
-import app from "..";
+import app from ".."
 
-export default app;
+export default app
