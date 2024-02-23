@@ -1,7 +1,8 @@
 import { prismaClient } from "../prisma/prismaService"
 import { ApiError } from "../exceptions/apiError"
+import { IBoardService } from "./interfaces/boardService.interface"
 
-class BoardService {
+class BoardService implements IBoardService{
   async addBoard(
     name: string,
     description: string,
@@ -187,4 +188,4 @@ class BoardService {
   }
 }
 
-export default new BoardService()
+export default BoardService

@@ -1,10 +1,15 @@
 import { Response, Request, NextFunction } from "express"
-import userService from "../service/userService"
 import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
 import { config } from "../config/config"
+import UserService from "../service/userService"
+import TokenService from "../service/tokenService"
+import MailService from "../service/mailService"
+import { IUserService } from "../service/interfaces/userService.interface"
 
 class UserController {
+  constructor(private readonly userService: IUserService) {}
+
   async register(req: Request, res: Response, next: NextFunction) {
     try {
       const errors = validationResult(req)
@@ -12,7 +17,11 @@ class UserController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { email, password, fullName } = req.body
-      const userData = await userService.register(email, password, fullName)
+      const userData = await this.userService.register(
+        email,
+        password,
+        fullName
+      )
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 60 * 24 * 3600 * 1000,
         httpOnly: true,
@@ -27,7 +36,7 @@ class UserController {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body
-      const userData = await userService.login(email, password)
+      const userData = await this.userService.login(email, password)
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 60 * 24 * 3600 * 1000,
         httpOnly: true,
@@ -42,7 +51,7 @@ class UserController {
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const { refreshToken } = req.cookies
-      await userService.logout(refreshToken)
+      await this.userService.logout(refreshToken)
       res.clearCookie("refreshToken")
       res.status(200).send()
     } catch (e) {
@@ -52,7 +61,7 @@ class UserController {
   async activate(req: Request, res: Response, next: NextFunction) {
     try {
       const activationLink = req.params.link
-      await userService.activate(activationLink)
+      await this.userService.activate(activationLink)
       res.redirect(config.CLIENT_URL! + "/login")
     } catch (e) {
       next(e)
@@ -61,7 +70,7 @@ class UserController {
   async refresh(req: Request, res: Response, next: NextFunction) {
     try {
       const { refreshToken } = req.cookies
-      const userData = await userService.refresh(refreshToken)
+      const userData = await this.userService.refresh(refreshToken)
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 60 * 24 * 3600 * 1000,
         httpOnly: true,
@@ -80,7 +89,7 @@ class UserController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { id, email, oldPassword, password, fullName } = req.body
-      const userData = await userService.updateUser(
+      const userData = await this.userService.updateUser(
         id,
         email,
         password,
@@ -101,7 +110,7 @@ class UserController {
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = Number(req.params.id)
-      await userService.deleteUser(userId, (res as any).user.email)
+      await this.userService.deleteUser(userId, (res as any).user.email)
       return res.json("User has been deleted")
     } catch (e) {
       next(e)
@@ -110,7 +119,10 @@ class UserController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = Number(req.params.id)
-      const user = await userService.getById(userId, (res as any).user.email)
+      const user = await this.userService.getById(
+        userId,
+        (res as any).user.email
+      )
       return res.json(user)
     } catch (e) {
       next(e)
@@ -119,7 +131,7 @@ class UserController {
   async getByIds(req: Request, res: Response, next: NextFunction) {
     try {
       const userIds = req.params.ids
-      const users = await userService.getByIds(userIds)
+      const users = await this.userService.getByIds(userIds)
       return res.json(users)
     } catch (e) {
       next(e)
@@ -128,7 +140,7 @@ class UserController {
   async searchUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const search = req.params.search
-      const users = await userService.searchUsers(search)
+      const users = await this.userService.searchUsers(search)
       return res.json(users)
     } catch (e) {
       next(e)
@@ -136,4 +148,6 @@ class UserController {
   }
 }
 
-export default new UserController()
+export default new UserController(
+  new UserService(new TokenService(), new MailService())
+)

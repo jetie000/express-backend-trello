@@ -1,7 +1,8 @@
 import { prismaClient } from "../prisma/prismaService"
 import { ApiError } from "../exceptions/apiError"
+import { ITaskService } from "./interfaces/taskService.interface"
 
-class TaskService {
+class TaskService implements ITaskService{
   async addTask(
     name: string,
     description: string,
@@ -107,4 +108,4 @@ class TaskService {
   }
 }
 
-export default new TaskService()
+export default TaskService

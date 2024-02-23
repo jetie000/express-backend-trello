@@ -1,7 +1,8 @@
 import { prismaClient } from "../prisma/prismaService"
 import { ApiError } from "../exceptions/apiError"
+import { IColumnService } from "./interfaces/columnService.interface"
 
-class ColumnService {
+class ColumnService implements IColumnService{
   async addColumn(name: string, boardId: number, email: string) {
     const boardToFind = await prismaClient.board.findUnique({
       where: {
@@ -110,4 +111,4 @@ class ColumnService {
   }
 }
 
-export default new ColumnService()
+export default ColumnService

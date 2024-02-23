@@ -1,7 +1,8 @@
 import { Transporter, createTransport } from "nodemailer"
 import { config } from "../config/config"
+import { IMailService } from "./interfaces/mailService.interface"
 
-class MailService {
+class MailService implements IMailService{
   transporter: Transporter
 
   constructor() {
@@ -31,4 +32,4 @@ class MailService {
   }
 }
 
-export default new MailService()
+export default MailService

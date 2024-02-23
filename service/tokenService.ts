@@ -2,8 +2,9 @@ import { sign, verify } from "jsonwebtoken"
 import { prismaClient } from "../prisma/prismaService"
 import { UserJwtPayload } from "../types/userJwtPayload"
 import { config } from "../config/config"
+import { ITokenService } from "./interfaces/tokenService.interface"
 
-class TokenService {
+class TokenService implements ITokenService{
   generateTokens(payload: UserJwtPayload) {
     const accessToken = sign(payload, config.JWT_SECRET!, {
       expiresIn: "30m"
@@ -55,4 +56,4 @@ class TokenService {
   }
 }
 
-export default new TokenService()
+export default TokenService

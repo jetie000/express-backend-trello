@@ -1,9 +1,11 @@
 import { Response, Request, NextFunction } from "express"
 import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
-import boardService from "../service/boardService"
+import BoardService from "../service/boardService"
+import { IBoardService } from "../service/interfaces/boardService.interface"
 
 class BoardController {
+  constructor(private readonly boardService: IBoardService) {}
   async addBoard(req: Request, res: Response, next: NextFunction) {
     try {
       const errors = validationResult(req)
@@ -11,7 +13,7 @@ class BoardController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { name, description, creatorId, userIds } = req.body
-      const boardData = await boardService.addBoard(
+      const boardData = await this.boardService.addBoard(
         name,
         description,
         creatorId,
@@ -30,7 +32,7 @@ class BoardController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { id, name, description, userIds } = req.body
-      const boardData = await boardService.updateBoard(
+      const boardData = await this.boardService.updateBoard(
         name,
         description,
         id,
@@ -46,7 +48,7 @@ class BoardController {
   async deleteBoard(req: Request, res: Response, next: NextFunction) {
     try {
       const boardId = Number(req.params.id)
-      const boardData = await boardService.deleteBoard(
+      const boardData = await this.boardService.deleteBoard(
         boardId,
         (res as any).user.email
       )
@@ -59,7 +61,7 @@ class BoardController {
   async leaveBoard(req: Request, res: Response, next: NextFunction) {
     try {
       const boardId = Number(req.params.id)
-      const boardData = await boardService.leaveBoard(
+      const boardData = await this.boardService.leaveBoard(
         boardId,
         (res as any).user.email
       )
@@ -72,7 +74,10 @@ class BoardController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const boardId = Number(req.params.id)
-      const board = await boardService.getById(boardId, (res as any).user.email)
+      const board = await this.boardService.getById(
+        boardId,
+        (res as any).user.email
+      )
       return res.json(board)
     } catch (e) {
       next(e)
@@ -82,7 +87,7 @@ class BoardController {
   async getByUserId(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = Number(req.params.id)
-      const boards = await boardService.getByUserId(
+      const boards = await this.boardService.getByUserId(
         userId,
         (res as any).user.email
       )
@@ -93,4 +98,4 @@ class BoardController {
   }
 }
 
-export default new BoardController()
+export default new BoardController(new BoardService())
