@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from "express"
 import { ApiError } from "../exceptions/apiError"
-import tokenService from "../service/tokenService"
+import TokenService from "../service/tokenService"
 import { UserJwtPayload } from "../types/userJwtPayload"
 import { prismaClient } from "../prisma/prismaService"
 
@@ -14,7 +14,7 @@ export async function authMiddleware(
     if (!authHeader) return next(ApiError.UnauthorizedError())
     const accessToken = authHeader.split(" ")[1]
     if (!accessToken) return next(ApiError.UnauthorizedError())
-    const userJwtData = tokenService.validateAccessToken(accessToken)
+    const userJwtData = new TokenService().validateAccessToken(accessToken)
     if (!userJwtData) return next(ApiError.UnauthorizedError())
     const user = await prismaClient.user.findFirst({
       where: {

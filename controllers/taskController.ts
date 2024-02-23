@@ -3,6 +3,7 @@ import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
 import TaskService from "../service/taskService"
 import { ITaskService } from "../service/interfaces/taskService.interface"
+import { prismaClient } from "../prisma/prismaService"
 
 class TaskController {
   constructor(private readonly taskService: ITaskService) {}
@@ -61,4 +62,4 @@ class TaskController {
   }
 }
 
-export default new TaskController(new TaskService())
+export default new TaskController(new TaskService(prismaClient))

@@ -1,10 +1,12 @@
-import { prismaClient } from "../prisma/prismaService"
+
+import { PrismaClient } from "@prisma/client"
 import { ApiError } from "../exceptions/apiError"
 import { IColumnService } from "./interfaces/columnService.interface"
 
-class ColumnService implements IColumnService{
+class ColumnService implements IColumnService {
+  constructor(private readonly prismaClient: PrismaClient) {}
   async addColumn(name: string, boardId: number, email: string) {
-    const boardToFind = await prismaClient.board.findUnique({
+    const boardToFind = await this.prismaClient.board.findUnique({
       where: {
         id: boardId,
         users: {
@@ -20,7 +22,7 @@ class ColumnService implements IColumnService{
     if (!boardToFind)
       throw ApiError.BadRequest(`Board with id ${boardId} doesn't exist`)
 
-    const column = await prismaClient.column.create({
+    const column = await this.prismaClient.column.create({
       data: {
         name,
         order: boardToFind.columns.length + 1,
@@ -35,7 +37,7 @@ class ColumnService implements IColumnService{
   }
 
   async updateColumn(name: string, order: number, id: number, email: string) {
-    const boardToFind = await prismaClient.board.findFirst({
+    const boardToFind = await this.prismaClient.board.findFirst({
       where: {
         columns: {
           some: { id }
@@ -54,7 +56,7 @@ class ColumnService implements IColumnService{
     const oldOrder = boardToFind.columns.find(c => c.id === id)?.order
     if (oldOrder && oldOrder !== order) {
       if (oldOrder < order) {
-        await prismaClient.column.updateMany({
+        await this.prismaClient.column.updateMany({
           where: {
             boardId: boardToFind.id,
             order: {
@@ -67,7 +69,7 @@ class ColumnService implements IColumnService{
           }
         })
       } else {
-        await prismaClient.column.updateMany({
+        await this.prismaClient.column.updateMany({
           where: {
             boardId: boardToFind.id,
             order: {
@@ -81,7 +83,7 @@ class ColumnService implements IColumnService{
         })
       }
     }
-    const column = await prismaClient.column.update({
+    const column = await this.prismaClient.column.update({
       where: { id },
       data: {
         name,
@@ -92,7 +94,7 @@ class ColumnService implements IColumnService{
   }
 
   async deleteColumn(id: number, email: string) {
-    const boardToFind = await prismaClient.board.findFirst({
+    const boardToFind = await this.prismaClient.board.findFirst({
       where: {
         columns: {
           some: { id }
@@ -105,7 +107,7 @@ class ColumnService implements IColumnService{
     if (!boardToFind) {
       throw ApiError.BadRequest(`Board with column id ${id} doesn't exist`)
     }
-    return await prismaClient.column.delete({
+    return await this.prismaClient.column.delete({
       where: { id }
     })
   }

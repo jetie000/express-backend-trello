@@ -3,6 +3,7 @@ import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
 import BoardService from "../service/boardService"
 import { IBoardService } from "../service/interfaces/boardService.interface"
+import { prismaClient } from "../prisma/prismaService"
 
 class BoardController {
   constructor(private readonly boardService: IBoardService) {}
@@ -98,4 +99,4 @@ class BoardController {
   }
 }
 
-export default new BoardController(new BoardService())
+export default new BoardController(new BoardService(prismaClient))

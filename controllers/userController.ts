@@ -1,14 +1,15 @@
 import { Response, Request, NextFunction } from "express"
 import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
-import { config } from "../config/config"
+import { configMy } from "../config/config"
 import UserService from "../service/userService"
 import TokenService from "../service/tokenService"
 import MailService from "../service/mailService"
+import { prismaClient } from "../prisma/prismaService"
 import { IUserService } from "../service/interfaces/userService.interface"
 
 class UserController {
-  constructor(private readonly userService: IUserService) {}
+  public constructor(private readonly userService: IUserService) {}
 
   async register(req: Request, res: Response, next: NextFunction) {
     try {
@@ -62,7 +63,7 @@ class UserController {
     try {
       const activationLink = req.params.link
       await this.userService.activate(activationLink)
-      res.redirect(config.CLIENT_URL! + "/login")
+      res.redirect(configMy.CLIENT_URL! + "/login")
     } catch (e) {
       next(e)
     }
@@ -149,5 +150,5 @@ class UserController {
 }
 
 export default new UserController(
-  new UserService(new TokenService(), new MailService())
+  new UserService(new TokenService(), new MailService(), prismaClient)
 )

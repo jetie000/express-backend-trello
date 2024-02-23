@@ -3,6 +3,7 @@ import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
 import ColumnService from "../service/columnService"
 import { IColumnService } from "../service/interfaces/columnService.interface"
+import { prismaClient } from "../prisma/prismaService"
 
 class ColumnController {
   constructor(private readonly columnService: IColumnService) {}
@@ -55,4 +56,4 @@ class ColumnController {
   }
 }
 
-export default new ColumnController(new ColumnService)
+export default new ColumnController(new ColumnService(prismaClient))

@@ -21,6 +21,7 @@ export interface IUserService {
   ): Promise<IRegisterResponse>
   deleteUser(userId: number, email: string): Promise<User>
   searchUsers(search: string): Promise<IUserFull[]>
+  saveToken(userId: number, refreshToken: string): Promise<void>
 }
 
 interface IRegisterResponse {
