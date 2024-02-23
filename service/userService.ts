@@ -4,6 +4,7 @@ import { v4 } from "uuid"
 import mailService from "./mailService"
 import tokenService from "./tokenService"
 import { ApiError } from "../exceptions/apiError"
+import { config } from "../config/config"
 
 class UserService {
   async register(email: string, password: string, fullName: string) {
@@ -35,7 +36,7 @@ class UserService {
     })
     await mailService.sendActivationMail(
       email,
-      process.env.API_URL + "/api/auth/activate/" + activationLinkId
+      config.API_URL + "/api/auth/activate/" + activationLinkId
     )
 
     return { ...tokens, email }
@@ -178,7 +179,7 @@ class UserService {
     if (!access)
       await mailService.sendActivationMail(
         email,
-        process.env.API_URL + "/api/activate/" + activationLinkId
+        config.API_URL + "/api/activate/" + activationLinkId
       )
     return { ...tokens, email }
   }

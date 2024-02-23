@@ -1,22 +1,23 @@
 import { Transporter, createTransport } from "nodemailer"
+import { config } from "../config/config"
 
 class MailService {
   transporter: Transporter
 
   constructor() {
     this.transporter = createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
+      host: config.SMTP_HOST,
+      port: Number(config.SMTP_PORT),
       secure: false,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD
+        user: config.SMTP_USER,
+        pass: config.SMTP_PASSWORD
       }
     })
   }
   async sendActivationMail(email: string, activationLink: string) {
     await this.transporter.sendMail({
-      from: process.env.SMTP_USER,
+      from: config.SMTP_USER,
       to: email,
       text: "",
       subject: "Активация аккаунта на TrelloClone",

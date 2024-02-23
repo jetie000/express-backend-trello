@@ -1,13 +1,14 @@
 import { sign, verify } from "jsonwebtoken"
 import { prismaClient } from "../prisma/prismaService"
 import { UserJwtPayload } from "../types/userJwtPayload"
+import { config } from "../config/config"
 
 class TokenService {
   generateTokens(payload: UserJwtPayload) {
-    const accessToken = sign(payload, process.env.JWT_SECRET!, {
+    const accessToken = sign(payload, config.JWT_SECRET!, {
       expiresIn: "30m"
     })
-    const refreshToken = sign(payload, process.env.JWT_REFRESH_SECRET!, {
+    const refreshToken = sign(payload, config.JWT_REFRESH_SECRET!, {
       expiresIn: "60d"
     })
     return {
@@ -31,7 +32,7 @@ class TokenService {
 
   validateAccessToken(token: string) {
     try {
-      const userData = verify(token, process.env.JWT_SECRET!)
+      const userData = verify(token, config.JWT_SECRET!)
       return userData
     } catch (e) {
       return null
@@ -40,7 +41,7 @@ class TokenService {
 
   validateRefreshToken(token: string) {
     try {
-      const userData = verify(token, process.env.JWT_REFRESH_SECRET!)
+      const userData = verify(token, config.JWT_REFRESH_SECRET!)
       return userData
     } catch (e) {
       return null

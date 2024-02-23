@@ -2,6 +2,7 @@ import { Response, Request, NextFunction } from "express"
 import userService from "../service/userService"
 import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
+import { config } from "../config/config"
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -52,7 +53,7 @@ class UserController {
     try {
       const activationLink = req.params.link
       await userService.activate(activationLink)
-      res.redirect(process.env.CLIENT_URL! + "/login")
+      res.redirect(config.CLIENT_URL! + "/login")
     } catch (e) {
       next(e)
     }
