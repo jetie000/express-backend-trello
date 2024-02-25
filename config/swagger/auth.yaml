@@ -1,0 +1,152 @@
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+  schemas:
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        fullName:
+          type: string
+
+    RegisterResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        email:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: example@gmail.com
+        password: 1234qwerty
+
+    LoginResponse:
+      type: object
+      properties:
+        id:
+          type: number
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        email:
+          type: string
+
+paths:
+  /auth/register:
+    post:
+      summary: Register an account
+      tags: [Authentification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        200:
+          description: Account registered.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        500:
+          description: Server error
+        400:
+          description: Bad request
+
+  /auth/login:
+    post:
+      summary: Log in account
+      tags: [Authentification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        200:
+          description: Succesfully logged in.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=erhdjfkhsdjkfhdsjfk.reskfdhsjjklfhjdskl; MaxAge=5184000000; HttpOnly; Secure; SameSite=none
+        500:
+          description: Server error
+        400:
+          description: Bad request (Wrong password | User not found | Confirm your account)
+
+  /auth/logout:
+    post:
+      security:
+        - cookieAuth: []
+      summary: Log out of account
+      tags: [Authentification]
+      responses:
+        200:
+          description: Succesfully logged out.
+        500:
+          description: Server error
+  /auth/activate/{link}:
+    get:
+      parameters:
+        - in: path
+          name: link
+          required: true
+          description: Activation link
+      summary: Activate account
+      tags: [Authentification]
+      responses:
+        302:
+          description: Redirects to login page
+        500:
+          description: Server error
+  /auth/refresh:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Refreshes token and returns new cookie
+      tags: [Authentification]
+      responses:
+        200:
+          description: Succesfully refreshed token.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=erhdjfkhsdjkfhdsjfk.reskfdhsjjklfhjdskl; MaxAge=5184000000; HttpOnly; Secure; SameSite=none
+        500:
+          description: Server error

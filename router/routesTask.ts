@@ -1,24 +1,28 @@
 import { body } from "express-validator"
 import taskController from "../controllers/taskController"
 import { authMiddleware } from "../middlewares/authMiddleware"
-import router from "./router"
+import { Router } from "express"
 
-router.post(
-  "/task",
+const taskRouter = Router()
+
+taskRouter.post(
+  "/",
   authMiddleware,
   body("name").trim().isLength({ min: 3, max: 30 }),
   body("userIds").isArray(),
   taskController.addTask.bind(taskController)
 )
-router.put(
-  "/task",
+taskRouter.put(
+  "/",
   authMiddleware,
   body("name").trim().isLength({ min: 3, max: 30 }),
   body("userIds").isArray(),
   taskController.updateTask.bind(taskController)
 )
-router.delete(
-  "/task/:id/board/:boardId",
+taskRouter.delete(
+  "/:id/board/:boardId",
   authMiddleware,
   taskController.deleteTask.bind(taskController)
 )
+
+export default taskRouter

@@ -98,11 +98,20 @@ class TaskService implements ITaskService {
         id: boardId,
         users: {
           some: { email }
+        },
+        columns: {
+          some: {
+            tasks: {
+              some: { id }
+            }
+          }
         }
       }
     })
     if (!boardToFind) {
-      throw ApiError.BadRequest(`Board with id ${boardId} doesn't exist`)
+      throw ApiError.BadRequest(
+        `Board with id ${boardId} doesn't exist or you don't have permission`
+      )
     }
     return await this.prismaClient.task.delete({
       where: { id }

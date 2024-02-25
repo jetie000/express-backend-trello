@@ -1,25 +1,37 @@
 import { body } from "express-validator"
 import userController from "../controllers/userController"
 import { authMiddleware } from "../middlewares/authMiddleware"
-import router from "./router"
+import { Router } from "express"
 
-router.get(
-  "/user/:id",
+const userRouter = Router()
+
+userRouter.get(
+  "/:id",
   authMiddleware,
   userController.getById.bind(userController)
 )
-router.get(
-  "/user/getByIds/:ids",
+userRouter.get(
+  "/getByIds/:ids",
   authMiddleware,
   userController.getByIds.bind(userController)
 )
-router.put(
-  "/user",
+userRouter.put(
+  "/",
   body("email").isEmail(),
-  body("password").trim().isLength({ min: 8, max: 30 }),
+  body("password").trim().optional().isLength({ min: 8, max: 30 }),
   body("fullName").trim().notEmpty(),
   authMiddleware,
   userController.updateUser.bind(userController)
 )
-router.delete("/user/:id", authMiddleware, userController.deleteUser)
-router.get("/user/search/:search", authMiddleware, userController.searchUsers)
+userRouter.delete(
+  "/:id",
+  authMiddleware,
+  userController.deleteUser.bind(userController)
+)
+userRouter.get(
+  "/search/:search",
+  authMiddleware,
+  userController.searchUsers.bind(userController)
+)
+
+export default userRouter

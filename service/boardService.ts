@@ -44,7 +44,7 @@ class BoardService implements IBoardService {
 
   async updateBoard(
     name: string,
-    description: string,
+    description: string | undefined,
     boardId: number,
     userIds: number[],
     email: string

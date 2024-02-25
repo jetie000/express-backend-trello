@@ -5,13 +5,13 @@ export interface IUserService {
     email: string,
     password: string,
     fullName: string
-  ): Promise<IRegisterResponse>
+  ): Promise<string>
   activate(activationLink: string): Promise<User[] | void>
   login(email: string, password: string): Promise<ILoginResponse>
   logout(refreshToken: string): Promise<void>
   refresh(refreshToken: string): Promise<IRegisterResponse>
   getById(userId: number, email: string): Promise<User | null>
-  getByIds(ids: string): Promise<IUserFull[]>
+  getByIds(ids: string): Promise<IUserMain[]>
   updateUser(
     id: number,
     email: string,
@@ -20,7 +20,7 @@ export interface IUserService {
     oldPassword: string
   ): Promise<IRegisterResponse>
   deleteUser(userId: number, email: string): Promise<User>
-  searchUsers(search: string): Promise<IUserFull[]>
+  searchUsers(search: string): Promise<IUserMain[]>
   saveToken(userId: number, refreshToken: string): Promise<void>
 }
 
@@ -37,7 +37,7 @@ interface ILoginResponse {
   id: number
 }
 
-interface IUserFull
+interface IUserMain
   extends Omit<
     User,
     "password" | "access" | "activationLink" | "refreshToken" | "joinDate"

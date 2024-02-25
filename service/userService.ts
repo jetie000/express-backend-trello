@@ -12,10 +12,7 @@ class UserService implements IUserService {
     private readonly tokenService: ITokenService,
     private readonly mailService: IMailService,
     private readonly prismaClient: PrismaClient
-  ) {
-    // console.log("ccc serv");
-    
-  }
+  ) {}
 
   async register(email: string, password: string, fullName: string) {
     const userToFind = await this.prismaClient.user.findFirst({
@@ -49,7 +46,7 @@ class UserService implements IUserService {
       configMy.API_URL + "/api/auth/activate/" + activationLinkId
     )
 
-    return { ...tokens, email }
+    return "User successfully registered, check email to confirm account"
   }
 
   async activate(activationLink: string) {
@@ -72,8 +69,6 @@ class UserService implements IUserService {
   }
 
   async login(email: string, password: string) {
-    console.log("SERVICE")
-
     const userToFind = await this.prismaClient.user.findFirst({
       where: {
         email: email
@@ -154,26 +149,36 @@ class UserService implements IUserService {
   async updateUser(
     id: number,
     email: string,
-    password: string,
+    password: string | undefined,
     fullName: string,
     oldPassword: string
   ) {
     const userToFind = await this.prismaClient.user.findFirst({
-      where: { email: email }
+      where: {
+        email: email,
+        id: {
+          not: id
+        }
+      }
     })
     if (userToFind)
       throw ApiError.BadRequest(`User with ${email} already exists`)
 
     const oldPass = await hash(oldPassword, 5)
-    const userThis = await this.prismaClient.user.findFirst({
-      where: { id, password: oldPass }
+    const userThis = await this.prismaClient.user.findUnique({
+      where: { id }
     })
-    if (!userThis)
-      throw ApiError.BadRequest(
-        `User with id ${id} or that refresh token doesn't exist`
-      )
-    const access = userThis.email === email
-    const hashPassword = await hash(password, 5)
+    let isEqual = false,
+      access = false
+
+    if (userThis) {
+      isEqual = await compare(oldPassword, userThis?.password)
+      access = userThis.email === email
+    }
+    if (!isEqual) throw ApiError.BadRequest(`Wrong password or id`)
+    let hashPassword
+    if (password) hashPassword = await hash(password, 5)
+    else hashPassword = oldPass
     const activationLinkId = v4()
     const tokens = this.tokenService.generateTokens({
       email,

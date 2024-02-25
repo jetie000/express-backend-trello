@@ -14,14 +14,14 @@ class TaskController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { name, description, userIds, columnId } = req.body
-      const columnData = await this.taskService.addTask(
+      const taskData = await this.taskService.addTask(
         name,
         description,
         userIds,
         columnId,
         (res as any).user.email
       )
-      return res.json(columnData)
+      return res.json(taskData)
     } catch (e) {
       next(e)
     }
@@ -33,7 +33,7 @@ class TaskController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { id, name, description, userIds, columnId } = req.body
-      const columnData = await this.taskService.updateTask(
+      const taskData = await this.taskService.updateTask(
         id,
         name,
         description,
@@ -41,7 +41,7 @@ class TaskController {
         columnId,
         (res as any).user.email
       )
-      return res.json(columnData)
+      return res.json(taskData)
     } catch (e) {
       next(e)
     }

@@ -1,23 +1,27 @@
 import { body } from "express-validator"
 import columnController from "../controllers/columnController"
 import { authMiddleware } from "../middlewares/authMiddleware"
-import router from "./router"
+import { Router } from "express"
 
-router.post(
-  "/column",
+const columnRouter = Router()
+
+columnRouter.post(
+  "/",
   authMiddleware,
   body("name").trim().isLength({ min: 3, max: 30 }),
   columnController.addColumn.bind(columnController)
 )
-router.put(
-  "/column",
+columnRouter.put(
+  "/",
   authMiddleware,
   body("name").trim().isLength({ min: 3, max: 30 }),
   body("order").trim().isInt(),
   columnController.updateColumn.bind(columnController)
 )
-router.delete(
-  "/column/:id",
+columnRouter.delete(
+  "/:id",
   authMiddleware,
   columnController.deleteColumn.bind(columnController)
 )
+
+export default columnRouter

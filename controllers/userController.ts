@@ -23,12 +23,6 @@ class UserController {
         password,
         fullName
       )
-      res.cookie("refreshToken", userData.refreshToken, {
-        maxAge: 60 * 24 * 3600 * 1000,
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
-      })
       return res.json(userData)
     } catch (e) {
       next(e)

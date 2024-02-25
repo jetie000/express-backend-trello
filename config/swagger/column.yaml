@@ -1,0 +1,119 @@
+components:
+  schemas:
+    Column:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        order:
+          type: number
+        boardId:
+          type: number
+        tasks:
+          type: array
+          required: false
+          items:
+            $ref: "#/components/schemas/Task"
+    ColumnInfo:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        order:
+          type: number
+        boardId:
+          type: number
+    AddColumnRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        boardId:
+          type: number
+    UpdateColumnRequest:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        order:
+          type: number
+
+paths:
+  /column:
+    post:
+      summary: Adds column
+      tags: [Column]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddColumnRequest"
+      responses:
+        200:
+          description: Column added.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ColumnInfo"
+        500:
+          description: Server error
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized error
+    put:
+      summary: Updates column
+      tags: [Column]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateColumnRequest"
+      responses:
+        200:
+          description: Column updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ColumnInfo"
+        500:
+          description: Server error
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized error
+
+  /column/{id}:
+    delete:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Column ID
+      security:
+        - bearerAuth: []
+      summary: Deletes column in a board you participate
+      tags: [Column]
+      responses:
+        200:
+          description: Column deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ColumnInfo"
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error
