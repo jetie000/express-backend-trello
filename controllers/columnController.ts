@@ -1,9 +1,12 @@
 import { Response, Request, NextFunction } from "express"
 import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
-import columnService from "../service/columnService"
+import ColumnService from "../service/columnService"
+import { IColumnService } from "../service/interfaces/columnService.interface"
+import { prismaClient } from "../prisma/prismaService"
 
 class ColumnController {
+  constructor(private readonly columnService: IColumnService) {}
   async addColumn(req: Request, res: Response, next: NextFunction) {
     try {
       const errors = validationResult(req)
@@ -11,7 +14,7 @@ class ColumnController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { name, boardId } = req.body
-      const columnData = await columnService.addColumn(
+      const columnData = await this.columnService.addColumn(
         name,
         boardId,
         (res as any).user.email
@@ -28,7 +31,7 @@ class ColumnController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { id, name, order } = req.body
-      const columnData = await columnService.updateColumn(
+      const columnData = await this.columnService.updateColumn(
         name,
         Number(order),
         id,
@@ -42,7 +45,7 @@ class ColumnController {
   async deleteColumn(req: Request, res: Response, next: NextFunction) {
     try {
       const columnId = Number(req.params.id)
-      const columnData = await columnService.deleteColumn(
+      const columnData = await this.columnService.deleteColumn(
         columnId,
         (res as any).user.email
       )
@@ -53,4 +56,4 @@ class ColumnController {
   }
 }
 
-export default new ColumnController()
+export default new ColumnController(new ColumnService(prismaClient))

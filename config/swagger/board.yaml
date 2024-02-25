@@ -1,0 +1,223 @@
+components:
+  schemas:
+    Board:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+          required: false
+        creatorId:
+          type: number
+        columns:
+          type: array
+          required: false
+          items:
+            $ref: "#/components/schemas/Column"
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserInfoResponse"
+    BoardInfo:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+          required: false
+        creatorId:
+          type: number
+    BoardByUserInfo:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+          required: false
+        creatorId:
+          type: number
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserInfoResponse"
+    AddBoardRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          required: false
+        creatorId:
+          type: number
+        userIds:
+          type: array
+          items:
+            type: number
+    UpdateBoardRequest:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+          required: false
+        creatorId:
+          type: number
+        userIds:
+          type: array
+          items:
+            type: number
+
+paths:
+  /board/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Board ID
+      security:
+        - bearerAuth: []
+      summary: Get board you participate by id
+      tags: [Board]
+      responses:
+        200:
+          description: Board all info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Board"
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error
+    delete:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Board ID
+      security:
+        - bearerAuth: []
+      summary: Delete your board id
+      tags: [Board]
+      responses:
+        200:
+          description: Board deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardInfo"
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error
+  /board:
+    post:
+      summary: Adds board
+      tags: [Board]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddBoardRequest"
+      responses:
+        200:
+          description: Board added.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardInfo"
+        500:
+          description: Server error
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized error
+    put:
+      summary: Updates board
+      tags: [Board]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBoardRequest"
+      responses:
+        200:
+          description: Board updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardInfo"
+        500:
+          description: Server error
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized error
+
+  /board/{id}/leave:
+    post:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Board ID
+      security:
+        - bearerAuth: []
+      summary: Leaves board you participate by board id
+      tags: [Board]
+      responses:
+        200:
+          description: You successfully left
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardInfo"
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error
+
+  /board/user/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: User ID
+      security:
+        - bearerAuth: []
+      summary: Get boards by your id
+      tags: [Board]
+      responses:
+        200:
+          description: Your boards info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BoardByUserInfo"
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error

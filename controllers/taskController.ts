@@ -1,9 +1,12 @@
 import { Response, Request, NextFunction } from "express"
 import { validationResult } from "express-validator"
 import { ApiError } from "../exceptions/apiError"
-import taskService from "../service/taskService"
+import TaskService from "../service/taskService"
+import { ITaskService } from "../service/interfaces/taskService.interface"
+import { prismaClient } from "../prisma/prismaService"
 
 class TaskController {
+  constructor(private readonly taskService: ITaskService) {}
   async addTask(req: Request, res: Response, next: NextFunction) {
     try {
       const errors = validationResult(req)
@@ -11,14 +14,14 @@ class TaskController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { name, description, userIds, columnId } = req.body
-      const columnData = await taskService.addTask(
+      const taskData = await this.taskService.addTask(
         name,
         description,
         userIds,
         columnId,
         (res as any).user.email
       )
-      return res.json(columnData)
+      return res.json(taskData)
     } catch (e) {
       next(e)
     }
@@ -30,7 +33,7 @@ class TaskController {
         return next(ApiError.BadRequest("Validation Error", errors.array()))
       }
       const { id, name, description, userIds, columnId } = req.body
-      const columnData = await taskService.updateTask(
+      const taskData = await this.taskService.updateTask(
         id,
         name,
         description,
@@ -38,7 +41,7 @@ class TaskController {
         columnId,
         (res as any).user.email
       )
-      return res.json(columnData)
+      return res.json(taskData)
     } catch (e) {
       next(e)
     }
@@ -47,7 +50,11 @@ class TaskController {
     try {
       const taskId = Number(req.params.id)
       const boardId = Number(req.params.boardId)
-      await taskService.deleteTask(boardId, taskId, (res as any).user.email)
+      await this.taskService.deleteTask(
+        boardId,
+        taskId,
+        (res as any).user.email
+      )
       return res.json("Task has been deleted")
     } catch (e) {
       next(e)
@@ -55,4 +62,4 @@ class TaskController {
   }
 }
 
-export default new TaskController()
+export default new TaskController(new TaskService(prismaClient))

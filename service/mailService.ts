@@ -1,23 +1,24 @@
 import { Transporter, createTransport } from "nodemailer"
-import { config } from "../config/config"
+import { configMy } from "../config/config"
+import { IMailService } from "./interfaces/mailService.interface"
 
-class MailService {
+class MailService implements IMailService {
   transporter: Transporter
 
   constructor() {
     this.transporter = createTransport({
-      host: config.SMTP_HOST,
-      port: Number(config.SMTP_PORT),
+      host: configMy.SMTP_HOST,
+      port: Number(configMy.SMTP_PORT),
       secure: false,
       auth: {
-        user: config.SMTP_USER,
-        pass: config.SMTP_PASSWORD
+        user: configMy.SMTP_USER,
+        pass: configMy.SMTP_PASSWORD
       }
     })
   }
   async sendActivationMail(email: string, activationLink: string) {
     await this.transporter.sendMail({
-      from: config.SMTP_USER,
+      from: configMy.SMTP_USER,
       to: email,
       text: "",
       subject: "Активация аккаунта на TrelloClone",
@@ -31,4 +32,4 @@ class MailService {
   }
 }
 
-export default new MailService()
+export default MailService

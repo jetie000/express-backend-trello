@@ -1,14 +1,16 @@
-import { prismaClient } from "../prisma/prismaService"
 import { ApiError } from "../exceptions/apiError"
+import { IBoardService } from "./interfaces/boardService.interface"
+import { PrismaClient } from "@prisma/client"
 
-class BoardService {
+class BoardService implements IBoardService {
+  constructor(private readonly prismaClient: PrismaClient) {}
   async addBoard(
     name: string,
     description: string,
     creatorId: number,
     userIds: number[]
   ) {
-    const userToFind = await prismaClient.user.findFirst({
+    const userToFind = await this.prismaClient.user.findFirst({
       where: {
         id: creatorId
       }
@@ -18,7 +20,7 @@ class BoardService {
     const userIdsToConnect = userIds.slice()
     if (!userIdsToConnect.find(id => id === creatorId))
       userIdsToConnect.push(creatorId)
-    const board = await prismaClient.board.create({
+    const board = await this.prismaClient.board.create({
       data: {
         name,
         description,
@@ -42,18 +44,18 @@ class BoardService {
 
   async updateBoard(
     name: string,
-    description: string,
+    description: string | undefined,
     boardId: number,
     userIds: number[],
     email: string
   ) {
-    const userToFind = await prismaClient.user.findUnique({
+    const userToFind = await this.prismaClient.user.findUnique({
       where: { email }
     })
     if (!userToFind)
       throw ApiError.BadRequest(`User with email ${email} doesn't exist`)
 
-    const boardToFind = await prismaClient.board.findFirst({
+    const boardToFind = await this.prismaClient.board.findFirst({
       where: {
         id: boardId
       },
@@ -70,7 +72,7 @@ class BoardService {
     const userIdsChecked = userIds.find(u => u === userToFind.id)
       ? userIds.map(id => ({ id: id }))
       : userIds.map(id => ({ id: id })).concat({ id: userToFind.id })
-    const board = await prismaClient.board.update({
+    const board = await this.prismaClient.board.update({
       where: { id: boardId },
       data: {
         name,
@@ -85,7 +87,7 @@ class BoardService {
   }
 
   async deleteBoard(boardId: number, email: string) {
-    const userDB = await prismaClient.user.findUnique({
+    const userDB = await this.prismaClient.user.findUnique({
       where: {
         email
       }
@@ -93,7 +95,7 @@ class BoardService {
     if (!userDB) {
       throw ApiError.BadRequest("Wrong credentials")
     }
-    return await prismaClient.board.delete({
+    return await this.prismaClient.board.delete({
       where: {
         id: boardId,
         creatorId: userDB.id
@@ -102,7 +104,7 @@ class BoardService {
   }
 
   async leaveBoard(boardId: number, email: string) {
-    const userDB = await prismaClient.user.findUnique({
+    const userDB = await this.prismaClient.user.findUnique({
       where: {
         email
       }
@@ -110,7 +112,7 @@ class BoardService {
     if (!userDB) {
       throw ApiError.BadRequest("Wrong credentials")
     }
-    return await prismaClient.board.update({
+    return await this.prismaClient.board.update({
       where: {
         id: boardId
       },
@@ -123,7 +125,7 @@ class BoardService {
   }
 
   async getById(boardId: number, email: string) {
-    return await prismaClient.board.findUnique({
+    return await this.prismaClient.board.findUnique({
       where: {
         id: boardId,
         users: {
@@ -164,7 +166,7 @@ class BoardService {
   }
 
   async getByUserId(userId: number, email: string) {
-    return await prismaClient.board.findMany({
+    return await this.prismaClient.board.findMany({
       where: {
         users: {
           some: {
@@ -187,4 +189,4 @@ class BoardService {
   }
 }
 
-export default new BoardService()
+export default BoardService

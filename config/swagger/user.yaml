@@ -1,0 +1,189 @@
+components:
+  schemas:
+    UpdateUserRequest:
+      type: object
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        password:
+          type: string
+        oldPassword:
+          type: string
+        fullName:
+          type: string
+
+    UserFullResponse:
+      type: object
+      properties:
+        id:
+          type: number
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+          required: false
+        email:
+          type: string
+        fullName:
+          type: string
+        password:
+          type: string
+        access:
+          type: boolean
+        activationLink:
+          type: string
+          required: false
+        joinDate:
+          type: string
+        loginDate:
+          type: string
+    UserMainResponse:
+      type: object
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        fullName:
+          type: string
+        loginDate:
+          type: string
+        boardsPartipated:
+          type: array
+          items:
+            $ref: "#/components/schemas/Board"
+          required: false
+        tasksParticipated:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+          required: false
+    UserInfoResponse:
+      type: object
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        fullName:
+          type: string
+        loginDate:
+          type: string
+
+paths:
+  /user/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: User ID
+      security:
+        - bearerAuth: []
+      summary: Get your account info by your id
+      tags: [User]
+      responses:
+        200:
+          description: User info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserFullResponse"
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error
+    delete:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: User ID
+      security:
+        - bearerAuth: []
+      summary: Delete your account by your id
+      tags: [User]
+      responses:
+        200:
+          description: User deleted
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error
+  /user:
+    put:
+      summary: Updates an account
+      tags: [User]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        200:
+          description: Account updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        500:
+          description: Server error
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized error
+
+  /user/getByIds/{ids}:
+    get:
+      parameters:
+        - in: path
+          name: ids
+          required: true
+          description: Users IDs
+          example: 1_27_32_45_54
+      security:
+        - bearerAuth: []
+      summary: Get users main info by ids
+      tags: [User]
+      responses:
+        200:
+          description: Users main info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserMainResponse"
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error
+  /user/search/{search}:
+    get:
+      parameters:
+        - in: path
+          name: search
+          required: true
+          description: Request string
+      security:
+        - bearerAuth: []
+      summary: Get users by search string
+      tags: [User]
+      responses:
+        200:
+          description: Users main info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserMainResponse"
+        500:
+          description: Server error
+        401:
+          description: Unauthorized error
